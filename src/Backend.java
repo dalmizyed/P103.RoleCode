@@ -1,8 +1,7 @@
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
+import java.util.*;
 
-public abstract class Backend implements BackendInterface {
+public class Backend implements BackendInterface {
 
     private IterableSortedCollection<GameRecord> tree;
 
@@ -21,7 +20,7 @@ public abstract class Backend implements BackendInterface {
      * @param record the game record to add
      */
     public void addRecord(GameRecord record) {
-        
+        this.tree.insert(record);
     }
   
     /**
@@ -35,8 +34,50 @@ public abstract class Backend implements BackendInterface {
      * @param filename is the name of the csv file to load data from
      * @throws IOException when there is trouble finding/reading file
      */
+    @Override
     public void readData(String filename) throws IOException {
+        try {
+            File file = new File(filename); // access file 
 
+                if (file.exists()) {
+                    Scanner inFile = new Scanner(file);
+
+                    int lineNum = 0;
+
+                    Map<String, Integer> columns = new HashMap<>();
+
+                    while (inFile.hasNextLine()) {
+                        
+                        String line = inFile.nextLine();
+                        String[] token = line.split("," );
+
+                        // assign columns to ensure correct data is found if .csv isn't organized correctly
+                        if (lineNum == 0) {
+                            for (int i = 0; i < token.length; i++) {
+                                columns.put(token[i].toLowerCase(), i);
+                            }
+                        } else {
+                            GameRecord newRecord = new GameRecord(
+                                token[columns.get("name")], // name
+                                GameRecord.Continent.valueOf(token[columns.get("location")]), // location
+                                Integer.parseInt(token[columns.get("score")]), // score
+                                Integer.parseInt(token[columns.get("collectables")]), // collectables
+                                Integer.parseInt(token[columns.get("level")]), // level
+                                token[columns.get("completion_time")] // completionTime
+                            ); 
+
+                            this.tree.insert(newRecord);
+                        }
+                        lineNum++;
+                    }
+
+                    inFile.close();
+                } else {
+                    System.err.println("File not found: " + file.getAbsolutePath());
+                }
+        } catch (IOException e) {
+            System.err.println("An I/O error occurred: " + e.getMessage());
+        }
     }
 
     /**
@@ -103,5 +144,11 @@ public abstract class Backend implements BackendInterface {
     public List<String> getTopTen() {
         ArrayList<String> newList = new ArrayList<>();
         return newList;
+    }
+
+    public static void main(String[] args) throws IOException {
+        Tree_Placeholder tree = new Tree_Placeholder();
+        Backend tester = new Backend(tree);
+        tester.readData("src\\records.csv");
     }
 }
