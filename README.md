@@ -1,18 +1,7 @@
-## Getting Started
+This assignment is designed to give you experience developing code without having access to all of that code’s dependencies. You will be developing half of the application-specific code for your project 1 this week (either the frontend or backend), and you will have your first chance to meet the other members of your project 1 team: all of whom are assigned to build either the frontend or backend of the same project as you.
 
-Welcome to the VS Code Java world. Here is a guideline to help you get started to write Java code in Visual Studio Code.
+An indie (independent) development team has decided they want a worldwide leaderboard for their roguelike game Dungeon Drifters. Roguelikes are games where players move through a series of procedurally generated levels and all progress is lost when the player dies. Players can manually submit their final progress to the leaderboard and check the current top records. Based on the leaderboard, the development team wants to award monthly prizes to encourage engagement. Due to this, they anticipate that some players might attempt to cheat in some way. If this becomes an issue, it could ruin their reputation and ultimately their business. The developers are busy creating their next game, so they have entrusted your team to create this application. The application will be making use of the BST that you are developing as part of project 1.
 
-## Folder Structure
+Since the backend developer does not yet have access to a working IterableRedBlackTree, they will instead be making use of a Tree_Placeholder for this week’s assignment.
 
-The workspace contains two folders by default, where:
-
-- `src`: the folder to maintain sources
-- `lib`: the folder to maintain dependencies
-
-Meanwhile, the compiled output files will be generated in the `bin` folder by default.
-
-> If you want to customize the folder structure, open `.vscode/settings.json` and update the related settings there.
-
-## Dependency Management
-
-The `JAVA PROJECTS` view allows you to manage your dependencies. More details can be found [here](https://github.com/microsoft/vscode-java-dependency#manage-dependencies).
+The backend developer’s job is to create a new public class named Backend that implements the provided BackendInterface and provides the functionality described within the comments provided with that interface. While you’re working on your code, keep in mind that users are going to attack the application. Reviewing the security of each implementation will be part of the code review assignment of project 1.
