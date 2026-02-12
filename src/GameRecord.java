@@ -36,4 +36,9 @@ public class GameRecord implements Comparable<GameRecord> {
     AFRICA, ASIA, ANTARCTICA, AUSTRALIA, EUROPE, NORTH_AMERICA, SOUTH_AMERICA
   }
 
+  @Override
+  public String toString() {
+    return this.name + ", " + this.location + ", " + this.score + ", " + this.collectables + ", " + this.level + ", (" + this.completionTime + ")";
+  }
+
 }

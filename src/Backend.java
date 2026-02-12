@@ -4,9 +4,16 @@ import java.util.*;
 public class Backend implements BackendInterface {
 
     private IterableSortedCollection<GameRecord> tree;
+    private String completionTimeFilter = null;
+    private Comparable<GameRecord> minLevelFilter = null;
+    private Comparable<GameRecord> maxLevelFilter = null;
+
 
     public Backend(IterableSortedCollection<GameRecord> tree) {
         this.tree = tree;
+        this.completionTimeFilter = null;
+        this.minLevelFilter = null;
+        this.maxLevelFilter = null;
     }
     // Your constructor must have the signature above. All methods below must
     // use the provided tree to store, sort, and iterate through records. This
@@ -19,6 +26,7 @@ public class Backend implements BackendInterface {
      *  tree, and to retrieve them by level range in the getRange method.
      * @param record the game record to add
      */
+    @Override
     public void addRecord(GameRecord record) {
         this.tree.insert(record);
     }
@@ -49,24 +57,24 @@ public class Backend implements BackendInterface {
                     while (inFile.hasNextLine()) {
                         
                         String line = inFile.nextLine();
-                        String[] token = line.split("," );
+                        String[] token = line.split("," ); // Tokenize current line.
 
-                        // assign columns to ensure correct data is found if .csv isn't organized correctly
+                        // Parse to find which column is associated with each data type.
                         if (lineNum == 0) {
                             for (int i = 0; i < token.length; i++) {
                                 columns.put(token[i].toLowerCase(), i);
                             }
-                        } else {
+                        } else { // Parse each individual record for data, then add new GameRecord object to the tree.
                             GameRecord newRecord = new GameRecord(
                                 token[columns.get("name")], // name
-                                GameRecord.Continent.valueOf(token[columns.get("location")]), // location
+                                GameRecord.Continent.valueOf(token[columns.get("continent")]), // location
                                 Integer.parseInt(token[columns.get("score")]), // score
                                 Integer.parseInt(token[columns.get("collectables")]), // collectables
                                 Integer.parseInt(token[columns.get("level")]), // level
                                 token[columns.get("completion_time")] // completionTime
                             ); 
 
-                            this.tree.insert(newRecord);
+                            this.addRecord(newRecord); // Add new record to tree.
                         }
                         lineNum++;
                     }
@@ -100,9 +108,54 @@ public class Backend implements BackendInterface {
      * @return List of names for all records from low to high that pass any
      *     set filter, or an empty list when no such records can be found
      */
+    @Override
     public List<String> getAndSetRange(Integer low, Integer high) {
-        ArrayList<String> newList = new ArrayList<>();
-        return newList;
+        // Create empty GameRecord objects that hold low and high level values to pass to iterator
+        if (low != null && high != null) {
+            GameRecord min = new GameRecord(null, null, 0, 0, low, null);
+            GameRecord max = new GameRecord(null, null, 0, 0, high, null);
+            
+            // Set iterator bounds.
+            this.tree.setIteratorMin(min);
+            this.tree.setIteratorMax(max);
+
+            this.minLevelFilter = min;
+            this.maxLevelFilter = max;
+        }
+
+        
+
+        // Retrieve iterator and set up filtered list.
+        Iterator<GameRecord> iterator = this.tree.iterator();
+        List<GameRecord> records = new ArrayList<>();
+
+        // Copy names of all GameRecord objects within the tree that are within the bounds.
+        while (iterator.hasNext()) {
+            GameRecord currentRecord = iterator.next();
+            records.add(currentRecord);
+        }
+
+        // Remove records that have a lower completion time value than the current completionTimeFilter.
+        if (this.completionTimeFilter != null) {
+            for(GameRecord record : records) {
+                if (record.getCompletionTime().compareTo(this.completionTimeFilter) < 0) {
+                    records.remove(record);
+                }
+            }
+        }
+
+        // Sort records by level value in ascending order.
+        records.sort(null);
+
+        // Create string list for storing player names in same order.
+        List<String> namesList = new ArrayList<>();
+
+        // Load player names from sorted GameRecord objects
+        for (GameRecord record : records) {
+            namesList.add(record.getName());
+        }
+
+        return namesList; // Return filtered list of names.
     }
 
     /**
@@ -124,9 +177,43 @@ public class Backend implements BackendInterface {
      *     are within any previously set level range, or an empty list 
      *     when no such records can be found
      */
+    @Override
     public List<String> applyAndSetFilter(String time) {
-        ArrayList<String> newList = new ArrayList<>();
-        return newList;
+        // Inherit current iterator bounds.
+        this.tree.setIteratorMin(this.minLevelFilter);
+        this.tree.setIteratorMax(this.maxLevelFilter);
+
+        // Set time filter
+        this.completionTimeFilter = time;
+
+        // Retrieve iterator object and setup records list.
+        Iterator<GameRecord> iterator = this.tree.iterator();
+        List<GameRecord> records = new ArrayList<>();
+        
+        // Add records from iterator to list.
+        while (iterator.hasNext()) {
+            records.add(iterator.next());
+        }
+
+        // Remove records that have a lower completion time value than the given time.
+        for(GameRecord record : records) {
+            if (record.getCompletionTime().compareTo(time) < 0) {
+                records.remove(record);
+            }
+        }
+
+        // Sort records list by level in ascending order.
+        records.sort(null);
+
+        // Create string list for storing player names in same order.
+        List<String> namesList = new ArrayList<>();
+
+        // Load player names from sorted GameRecord objects
+        for (GameRecord record : records) {
+            namesList.add(record.getName());
+        }
+
+        return namesList; // Return filtered list of names.
     }
 
     /**
@@ -141,14 +228,72 @@ public class Backend implements BackendInterface {
      *
      * @return List of ten record names with the most collectables
      */
+    @Override
     public List<String> getTopTen() {
-        ArrayList<String> newList = new ArrayList<>();
-        return newList;
-    }
+        // Inherit current iterator bounds.
+        this.tree.setIteratorMin(this.minLevelFilter);
+        this.tree.setIteratorMax(this.maxLevelFilter);
 
-    public static void main(String[] args) throws IOException {
-        Tree_Placeholder tree = new Tree_Placeholder();
-        Backend tester = new Backend(tree);
-        tester.readData("src\\records.csv");
+        // Retrieve iterator object and setup records list.
+        Iterator<GameRecord> iterator = this.tree.iterator();
+        List<GameRecord> records = new ArrayList<>();
+        
+        // Add records from iterator to list.
+        while (iterator.hasNext()) {
+            records.add(iterator.next());
+        }
+
+        // Remove records that have a lower completion time value than the current completionTimeFilter.
+        if (this.completionTimeFilter != null) {
+            for(GameRecord record : records) {
+                if (record.getCompletionTime().compareTo(this.completionTimeFilter) < 0) {
+                    records.remove(record);
+                }
+            }
+        }
+
+        // Set up array for top 10 list sorted by # of collectables in descending order.
+        ArrayList<GameRecord> topTen = new ArrayList<>();
+
+        // For all records, compare with each existing member of top 10, and place accordingly.
+        for (GameRecord record : records) {
+            System.out.println(topTen);
+
+            if (topTen.size() == 0) {
+                topTen.add(record);
+            } else {
+                int indexToInsert = 0;
+                for (int i = 0; i < topTen.size(); i++) {
+                    GameRecord recordToCompare = topTen.get(i);
+                    if (recordToCompare != null) {
+                        System.out.println("Comparing to " + recordToCompare.getName());
+
+                        // if record has more collectables than recordToCompare, then shift recordToCompare down by 1 slot and replace it with record.
+                        if (record.getCollectables() < recordToCompare.getCollectables()) {
+                            indexToInsert = i + 1;
+                        }
+
+                        if (i >= 10) {
+                            topTen.remove(i);
+                        } 
+                    } else {
+                        System.out.println("Comparing to NULL");
+                    }
+                }
+                topTen.add(indexToInsert, record);
+            }
+        }
+
+        // Create string list for storing player names in same order.
+        List<String> namesList = new ArrayList<>();
+
+        // Load player names from TopTen array
+        for (GameRecord record : topTen) {
+            if (record != null) {
+                namesList.add(record.getName());
+            }
+        }
+
+        return namesList; // Return filtered list of names.
     }
 }

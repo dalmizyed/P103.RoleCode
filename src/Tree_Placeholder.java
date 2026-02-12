@@ -1,7 +1,7 @@
-import java.util.List;
-import java.util.Arrays;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 
 /**
  * This is a placeholder for the fully working Tree that will be developed in a
@@ -68,6 +68,7 @@ public class Tree_Placeholder implements IterableSortedCollection<GameRecord> {
             }
 
         // and return a new iterator that steps through the remaining values
+
         return tmp.iterator();
     }
 }
