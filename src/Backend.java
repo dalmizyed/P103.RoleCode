@@ -257,8 +257,6 @@ public class Backend implements BackendInterface {
 
         // For all records, compare with each existing member of top 10, and place accordingly.
         for (GameRecord record : records) {
-            System.out.println(topTen);
-
             if (topTen.size() == 0) {
                 topTen.add(record);
             } else {
@@ -266,7 +264,6 @@ public class Backend implements BackendInterface {
                 for (int i = 0; i < topTen.size(); i++) {
                     GameRecord recordToCompare = topTen.get(i);
                     if (recordToCompare != null) {
-                        System.out.println("Comparing to " + recordToCompare.getName());
 
                         // if record has more collectables than recordToCompare, then shift recordToCompare down by 1 slot and replace it with record.
                         if (record.getCollectables() < recordToCompare.getCollectables()) {
@@ -276,8 +273,6 @@ public class Backend implements BackendInterface {
                         if (i >= 10) {
                             topTen.remove(i);
                         } 
-                    } else {
-                        System.out.println("Comparing to NULL");
                     }
                 }
                 topTen.add(indexToInsert, record);
