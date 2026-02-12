@@ -137,12 +137,16 @@ public class Backend implements BackendInterface {
 
         // Remove records that have a lower completion time value than the current completionTimeFilter.
         if (this.completionTimeFilter != null) {
-            for(GameRecord record : records) {
-                if (record.getCompletionTime().compareTo(this.completionTimeFilter) < 0) {
+            for(int i = 0; i < records.size(); i++) {
+                GameRecord record = records.get(i);
+                if (record.getCompletionTime().compareTo(this.completionTimeFilter) > 0) {
                     records.remove(record);
+                    i--;
                 }
             }
         }
+
+        
 
         // Sort records by level value in ascending order.
         records.sort(null);
@@ -196,9 +200,11 @@ public class Backend implements BackendInterface {
         }
 
         // Remove records that have a lower completion time value than the given time.
-        for(GameRecord record : records) {
-            if (record.getCompletionTime().compareTo(time) < 0) {
+        for(int i = 0; i < records.size(); i++) {
+            GameRecord record = records.get(i);
+            if (record.getCompletionTime().compareTo(time) > 0) {
                 records.remove(record);
+                i--;
             }
         }
 
@@ -245,9 +251,11 @@ public class Backend implements BackendInterface {
 
         // Remove records that have a lower completion time value than the current completionTimeFilter.
         if (this.completionTimeFilter != null) {
-            for(GameRecord record : records) {
-                if (record.getCompletionTime().compareTo(this.completionTimeFilter) < 0) {
+            for(int i = 0; i < records.size(); i++) {
+                GameRecord record = records.get(i);
+                if (record.getCompletionTime().compareTo(this.completionTimeFilter) > 0) {
                     records.remove(record);
+                    i--;
                 }
             }
         }
